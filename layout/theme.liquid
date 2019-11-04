@@ -1,197 +1,181 @@
-<!DOCTYPE html>
-<html class="no-js" lang="{{ shop.locale }}">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
-    <meta content="width=device-width,initial-scale=1" name="viewport" />
-    <meta name="theme-color" content="{{ settings.color_button }}" />
-    <link rel="canonical" href="{{ canonical_url }}" />
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="ie9 no-js"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->  
+<head>
+  <meta charset="utf-8" />
+  <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' /><![endif]-->
 
-    {%- if settings.favicon != blank -%}
-    <link
-      rel="shortcut icon"
-      href="{{ settings.favicon | img_url: '32x32' }}"
-      type="image/png"
-    />
-    {%- endif -%} {%- capture seo_title -%} {%- if request.page_type == 'search'
-    and search.performed == true -%}
-    {{
-      "general.search.heading" | t: count:search.results_count
-    }}:
-    {{ 'general.search.results_with_count' | t: terms: search.terms, count: search.results_count }}
-    {%- else -%}
-    {{
-      page_title
-    }}
-    {%- endif -%} {%- if current_tags -%} {%- assign meta_tags = current_tags |
-    join: ', ' -%} &ndash;
-    {{ 'general.meta.tags' | t: tags: meta_tags -}}
-    {%- endif -%} {%- if current_page != 1 -%} &ndash;
-    {{
-      "general.meta.page" | t: page:current_page
-    }}
-    {%- endif -%} {%- assign escaped_page_title = page_title | escape -%} {%-
-    unless escaped_page_title contains shop.name -%} &ndash;
-    {{
-      shop.name
-    }}
-    {%- endunless -%} {%- endcapture -%}
-    <title>This is Title: {{ seo_title | strip }}</title>
+  <title>
+  {{ page_title }}{% if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
 
-    {%- if page_description -%}
-    <meta name="description" content="{{ page_description | escape }}" />
-    {%- endif -%} {% render 'social-meta-tags' %}
+  {% if page_description %}
+  <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
 
-    {{
-      "theme.scss" | asset_url | stylesheet_tag
-    }}
+  <link rel="canonical" href="{{ canonical_url }}" />
 
-    <script>
-      var theme = {
-        breakpoints: {
-          medium: 750,
-          large: 990,
-          widescreen: 1400
-        },
-        strings: {
-          addToCart: {{ 'products.product.add_to_cart' | t | json }},
-          soldOut: {{ 'products.product.sold_out' | t | json }},
-          unavailable: {{ 'products.product.unavailable' | t | json }},
-          regularPrice: {{ 'products.product.regular_price' | t | json }},
-          salePrice: {{
-            'products.product.sale_price' | t | json }},
-          sale: {{ 'products.product.on_sale' | t | json }},
-          showMore: {{ 'general.filters.show_more' | t | json }},
-          showLess: {{ 'general.filters.show_less' | t | json }},
-          addressError: {{ 'sections.map.address_error' | t | json }},
-          addressNoResults: {{ 'sections.map.address_no_results' | t | json }},
-          addressQueryLimit: {{ 'sections.map.address_query_limit_html' | t | json }},
-          authError: {{ 'sections.map.auth_error_html' | t | json }},
-          newWindow: {{ 'general.accessibility.link_messages.new_window' | t | json }},
-          external: {{ 'general.accessibility.link_messages.external' | t | json }},
-          newWindowExternal: {{ 'general.accessibility.link_messages.new_window_and_external' | t | json }},
-          removeLabel: {{ 'cart.label.remove' | t: product: '[product]' | json }},
-          update: {{ 'cart.label.update' | t | json }},
-          quantity: {{ 'cart.label.quantity' | t | json }},
-          discountedTotal: {{ 'cart.label.discounted_total' | t | json }},
-          regularTotal: {{ 'cart.label.regular_total' | t | json }},
-          priceColumn: {{ 'cart.label.price_column' | t | json }},
-          quantityMinimumMessage: {{ 'products.product.quantity_minimum_message' | t | json }},
-          cartError: {{ 'cart.general.cart_error' | t | json }},
-          removedItemMessage: {{ 'cart.general.removed_item_html' | t: quantity: '[quantity]', link: '[link]' | json }},
-          unitPrice: {{ 'products.product.unit_price_label' | t | json }},
-          unitPriceSeparator: {{ 'general.accessibility.unit_price_separator' | t | json }},
-          oneCartCount: {{ 'cart.popup.cart_count' | t: count: 1 | json }},
-          otherCartCount: {{ 'cart.popup.cart_count' | t: count: '[count]' | json }},
-          quantityLabel: {{ 'cart.popup.quantity_label' | t: quantity_count: '[count]' | json }}
-        },
-        moneyFormat: {{ shop.money_format | json }},
-        moneyFormatWithCurrency: {{ shop.money_with_currency_format | json }}
-      }
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  {% include 'open-graph-tags' %}
+  {% include 'twitter-card' %}
 
-      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
-    </script>
+  {{ content_for_header }}
 
-    {%- if request.page_type contains 'customers/' -%}
-    <script
-      src="{{ 'shopify_common.js' | shopify_asset_url }}"
-      defer="defer"
-    ></script>
-    {%- endif -%}
+  {{ 'style.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'social/social-icons.css' | global_asset_url | stylesheet_tag }}
+  {{ '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css' | stylesheet_tag }}
+  
+  {{ '//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,400italic,600italic,700italic' | stylesheet_tag }}
 
-    <script src="{{ 'lazysizes.js' | asset_url }}" async="async"></script>
-    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+  <!--[if lt IE 9]>
+  {{ '//html5shiv.googlecode.com/svn/trunk/html5.js' | script_tag }}
+  <![endif]-->
 
-    {{
-      content_for_header
-    }}
-  </head>
+  {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+  {% if template contains 'customers' %}  
+  {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+  
+  <!-- Additional Shopify helpers that will likely be added to the global shopify_common.js some day soon. -->
+  {{ 'shopify_common.js'  | asset_url | script_tag }}
 
-  <!-- <body class="template-{{ request.page_type | handle }}"> -->
-  <body class="main-body">
-    <div class="header">
-      <a class="in-page-link visually-hidden skip-link" href="#MainContent">{{
-        "general.accessibility.skip_to_content" | t
-      }}</a>
+  {{ 'option_selection.js' | shopify_asset_url | script_tag }}
 
-      <div
-        id="SearchDrawer"
-        class="search-bar drawer drawer--top"
-        role="dialog"
-        aria-modal="true"
-        aria-label="{{ 'general.search.placeholder' | t }}"
-      >
-        <h1>TEST TEST TEST</h1>
-        <div class="search-bar__table">
-          <div class="search-bar__table-cell search-bar__form-wrapper">
-            <form
-              class="search search-bar__form"
-              action="{{ routes.search_url }}"
-              method="get"
-              role="search"
-            >
-              <input
-                class="search__input search-bar__input"
-                type="search"
-                name="q"
-                value="{{ search.terms | escape }}"
-                placeholder="{{ 'general.search.placeholder' | t }}"
-                aria-label="{{ 'general.search.placeholder' | t }}"
-              />
-              <button
-                class="search-bar__submit search__submit btn--link"
-                type="submit"
-              >
-                {% render 'icon-search' %}
-                <span class="icon__fallback-text">{{
-                  "general.search.submit" | t
-                }}</span>
-              </button>
-            </form>
-          </div>
-          <div class="search-bar__table-cell text-right">
-            <button
-              class="btn--link search-bar__close js-drawer-close"
-              type="button"
-            >
-              {% render 'icon-close' %}
-              <span class="icon__fallback-text">{{
-                "general.search.close" | t
-              }}</span>
-            </button>
-          </div>
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }}
+  <script>jQuery('html').removeClass('no-js').addClass('js');</script>
+
+</head>
+
+<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}" >
+
+  <div class="container">
+
+    <header class="row">
+      
+      <div class="social-links half column left-aligned">
+      {% include 'social-links' %}
+      </div>      
+      
+      {% comment %}
+        Note on checkout link: it is a good idea to avoid linking to /checkout directly because shops that use 
+        Paypal Express Checkout and/or Google Checkout have special checkout buttons on the /cart page. Also,
+        special instructions for the seller are entered on the /cart page. Finally, the universal tracking code 
+        of Google Analytics may not work if linking directly to the /checkout page.
+      {% endcomment %}
+      
+      <div class="half column right-aligned">
+              
+        <div class="cart-link">
+          <a href="/cart"><img src="{{ 'cart.svg' | asset_url }}" /> {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }} ({{ cart.total_price | money }})</a>
         </div>
+            
+        {% if shop.customer_accounts_enabled %}
+        <div class="customer-links">
+          {% if customer %}
+            Logged in as <a href="/account">{{ customer.first_name }}</a> · {{ 'Log out' | customer_logout_link }}
+          {% else %}
+            {{ 'Log in' | customer_login_link }}
+            {% if shop.customer_accounts_optional %}
+            or {{ 'Create an account' | customer_register_link }}
+            {% endif %}
+          {% endif %}
+        </div>
+        {% endif %}
+        
       </div>
+      
+      {% comment %}
+        It would be nice if the logo was a shop setting, rather than a theme setting.
+        But for now, it is a theme setting. The shop logo is uploaded on the theme settings page.
+        Link to the theme settings page of currently published theme will always be:
+        http://www.shopify.com/admin/themes/current/settings.
+        To add theme settings to a theme, see this: http://docs.shopify.com/themes/theme-templates/settings
+        Theme settings are added to http://www.shopify.com/admin/themes/current#config/settings.html
+      {% endcomment %}
+    
+      <div class="masthead full column clear centered" role="banner">
+        {% if settings.use_logo %}
+        <a id="logo" href="/">
+          {{ 'logo.png' | asset_url | img_tag: shop.name }}
+        </a>
+        {% else %}
+        <a id="site-title" href="/">
+          {{ shop.name }}
+        </a>
+        {% endif %}
+        {% if template == 'index' %}
+        {% comment %}
+          Many SEO audit tools look for a h1 tag on the home page. Let's give 'em one.
+          Other pages should use the resource name as h1 tag. For example, on the product
+          page, the product title will use a h1 tag.
+        {% endcomment %}
+        <h1 class="hidden">{{ shop.name }}</h1>
+        {% endif %}
+      </div>
+      
+      <div class="clear full column">
+      
+        {% comment %}
+          Main Navigation 
+        {% endcomment %}
+        {% include 'site-nav' %}
+      
+        {% comment %}
+          IE8 and IE9 don't support the HTML5 placeholder attribute, so it's a good idea to use JavaScript
+          to show and hide the placeholder text.
+          Have a look in assets/shop.js.liquid to see sample JavaScript for this.
+        {% endcomment %}      
+        <form action="/search" method="get" class="search-form right" role="search">
+          <input name="q" type="search" id="search-field" placeholder="Search store..." value="{{ search.terms | escape }}" />
+          <input type="submit" id="search-submit" value="Search" />
+        </form>
+
+      </div>
+      
+    </header>
+
+    <div id="main" role="main">
+      {% comment %}}
+        We have a template file to render.
+        That's what content_for_layout is for.
+      {% endcomment %}
+      {{ content_for_layout }}
     </div>
 
-    {%- if settings.enable_ajax -%} {% render 'cart-popup' %} {%- endif -%} {%
-    section 'header' %}
-
-    <div class="page-container" id="PageContainer">
-      <main
-        class="main-content js-focus-hidden"
-        id="MainContent"
-        role="main"
-        tabindex="-1"
-      >
-        {{ content_for_layout }}
-      </main>
-
-      {% section 'footer' %}
-
-      <div aria-hidden="true" class="visually-hidden" id="slideshow-info">
-        {{- 'sections.slideshow.navigation_instructions' | t -}}
+    <footer>
+  
+      {% if linklists.footer.links.size > 0 %}
+      <p role="navigation">
+      {% for link in linklists.footer.links %}
+        <a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a>
+      {% endfor %}
+      </p>
+      {% endif %}
+      
+      {% unless shop.enabled_payment_types == empty %}
+	  <div class="payment-types">
+        {% for type in shop.enabled_payment_types %}
+        <img width="40" src="{{ type | payment_type_img_url }}" />
+        {% endfor %}
       </div>
-    </div>
+      {% endunless %}
+      
+      <p role="contentinfo" class="small-print">Copyright &copy; {{ "now" | date: "%Y" }} {{ shop.name }}. {{ powered_by_link }}.</p>
 
-    <ul hidden>
-      <li id="a11y-refresh-page-message">
-        {{ "general.accessibility.refresh_page" | t }}
-      </li>
-      <li id="a11y-selection-message">
-        {{ "general.accessibility.selection_help" | t }}
-      </li>
-    </ul>
-  </body>
+    </footer>
+
+    {% comment %}Shopify does not support Internet Explorer 6 nor 7. It does encourage themes to support IE8 until the end of 2014.{% endcomment %}
+    <!--[if lt IE 8]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+    
+  </div><!-- end of #container -->
+
+  {{ 'shop.js'  | asset_url | script_tag }}
+
+</body>
 </html>
