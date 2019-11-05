@@ -1,3 +1,3 @@
 # github-webhooks-test
 
-hi there
+hi
